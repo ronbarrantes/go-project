@@ -1,5 +1,5 @@
-module github.com/ronbarrantes/go-project
+module go-project
 
 go 1.21.5
 
-require github.com/gorilla/mux v1.8.1 // indirect
+require github.com/tbxark/g4vercel v0.0.4 // indirect
