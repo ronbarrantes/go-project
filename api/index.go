@@ -12,7 +12,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "<h1>Hello from vercel</h1>")
-
 }
 
 // func Handler(w http.ResponseWriter, r *http.Request) {
