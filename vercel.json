@@ -1,12 +1,8 @@
 {
-"rewrites": [
-  {"source": "/api"},{"destination": "/"}
-],
+  "rewrites": [{ "source": "/api", "destination": "/" }],
   "build": {
-
     "env": {
       "GO_BUILD_FLAGS": "-ldflags '-s -w'"
     }
   }
 }
-
