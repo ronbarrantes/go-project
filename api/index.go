@@ -14,7 +14,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	count += 1
+	count = count + 1
 
 	fmt.Fprintf(w, "<h1>Hello from vercel, clicked %d</h1>", count)
 }
