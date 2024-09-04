@@ -28,5 +28,5 @@ func main() {
 	p1 := &Page{Title: "TestPage", Body: []byte("This is a sample page")}
 	p1.save()
 	p2, _ := loadPage("TestPage")
-	fmt.Println(p2.Body)
+	fmt.Println(string(p2.Body))
 }
