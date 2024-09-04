@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Go",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}"
+    },
+
+    // {
+    //   "name": "Launch Air",
+    //   "type": "go",
+    //   "request": "launch",
+    //   "mode": "auto",
+    //   "program": "${workspaceFolder}",
+    //   "preLaunchTask": "Run air",
+    //   "cwd": "${workspaceFolder}",
+    //   "env": {}
+    // },
+
+    {
+      "name": "Attach to air",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "remotePath": "",
+      "port": 2345, // Ensure this matches your dlv port
+      "host": "127.0.0.1",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
