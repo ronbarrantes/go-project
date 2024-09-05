@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,13 +16,31 @@ type Page struct {
 
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
+// check if directory exist and if it doesn't create one
+
+const localdata = "localdata"
+
+func init_directory(s string) error {
+	info, err := os.Stat(s)
+	if os.IsNotExist(err) {
+		return os.MkdirAll(s, 0700)
+	}
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("%s already exists but is not a directory", s)
+	}
+	return nil
+}
+
 func (p *Page) save() error {
-	filename := "localdata/" + p.Title + ".txt"
+	filename := localdata + "/" + p.Title + ".txt"
 	return os.WriteFile(filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
-	filename := "localdata/" + title + ".txt"
+	filename := localdata + "/" + title + ".txt"
 	body, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -75,6 +94,9 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 }
 
 func main() {
+	// Add a local data dir if it doesn't exist
+	init_directory(localdata)
+
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
