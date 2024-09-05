@@ -3,6 +3,7 @@
 logs*.*
 /temp
 /tmp
+/localdata
 
 # Created by https://www.toptal.com/developers/gitignore/api/vim,visualstudiocode,visualstudio,jetbrains,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,visualstudiocode,visualstudio,jetbrains,go
