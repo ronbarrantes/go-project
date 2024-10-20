@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"ronb.co/project/database"
+	"github.com/gin-gonic/gin"
+	// "ronb.co/project/database"
 	"ronb.co/project/utils"
 )
 
@@ -14,15 +15,28 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello World!")
 }
 
-func main() {
+func run() {
 	utils.LoadEnvs()
-	database.InitDB()
+	// database.InitDB()
 
 	PORT := os.Getenv("PORT")
-	http.HandleFunc("/", HelloWorld)
 
-	http.HandleFunc("/qr", utils.PrintQRCode)
+	r := gin.Default()
+	// r.GET("/", func(c *gin.Context) {
+	// 	c.JSON(200, gin.H{
+	// 		"message": "pong",
+	// 	})
+	// })
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"hello": "world",
+		})
+	})
 
-	log.Println("Running on port", PORT)
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+PORT, nil))
+	log.Fatal(r.Run(":" + PORT))
+
+}
+
+func main() {
+	run()
 }
