@@ -55,19 +55,19 @@ func (s *APIServer) Run() {
 
 func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
 
-	if r.Method == "GET" {
+	switch r.Method {
+	case "GET":
 		return s.handleGetAccount(w, r)
-	}
 
-	if r.Method == "POST" {
+	case "POST":
 		return s.handleCreateAccount(w, r)
-	}
 
-	if r.Method == "DELETE" {
+	case "DELETE":
 		return s.handleDeleteAccount(w, r)
-	}
 
-	return fmt.Errorf("Method not allowed %s", r.Method)
+	default:
+		return fmt.Errorf("Method not allowed %s", r.Method)
+	}
 }
 
 func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
