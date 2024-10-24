@@ -1,20 +1,21 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
+	// "github.com/gorilla/mux"
 	"ronb.co/project/utils"
 )
 
 func main() {
 	PORT := "8000"
 
+	// router := mux.NewRouter()
+
 	http.HandleFunc("/users", GetUsers)
-
-	fmt.Println(utils.GenerateRandomId())
-
 	fmt.Printf("Listening on %s", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, nil))
 }
@@ -31,7 +32,7 @@ type User struct {
 
 func MakeUser(firstName, lastName string) *User {
 	user := User{
-		ID:        "0000",
+		ID:        utils.GenerateRandomId(),
 		FirstName: firstName,
 		LastName:  lastName,
 	}
@@ -40,11 +41,24 @@ func MakeUser(firstName, lastName string) *User {
 
 // GetUsers
 func GetUsers(w http.ResponseWriter, r *http.Request) {
+	users := []User{
+		*MakeUser("Ron", "B"),
+		*MakeUser("Jen", "M"),
+	}
 
-	users := []User{}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+}
 
-	fmt.Printf("%s", users)
+type APIError struct {
+	Error string
+}
 
+func WriteJSON(w http.ResponseWriter, status int, v any) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	return json.NewEncoder(w).Encode(v)
 }
 
 // GetUserById
