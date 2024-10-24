@@ -3,23 +3,24 @@ package utils
 import (
 	"crypto/rand"
 	"log"
-	"math/big"
 	"strings"
 )
 
 func GenerateRandomId() string {
 	length := 10
 	keys := "1234567890abcdefghijklmnopqrstuvwxyz"
+	keyLen := byte(len(keys))
 
 	var sb strings.Builder
+	randomBytes := make([]byte, length)
 
-	for i := 0; i < length; i++ {
-		// idx := rand.Intn(len(keys))
-		idx, err := rand.Int(rand.Reader, big.NewInt(int64(len(keys))))
-		if err != nil {
-			log.Fatalf("Failed to generate random index: %v", err)
-		}
-		sb.WriteByte(keys[idx.Int64()])
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		log.Fatalf("Failed to generate random bytes: %v", err)
+	}
+
+	for _, b := range randomBytes {
+		sb.WriteByte(keys[b%keyLen])
 	}
 
 	return sb.String()
