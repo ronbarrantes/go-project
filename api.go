@@ -27,7 +27,7 @@ func Server(listerAddr string) *APIServer {
 
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
-	router.HandleFunc("/users", s.handleAccount)
+	router.HandleFunc("/api/users", s.handleAccount)
 	fmt.Printf("Listening on %s", s.listenAddress)
 	log.Fatal(http.ListenAndServe(":"+s.listenAddress, router))
 }
@@ -71,6 +71,12 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if newUser.FirstName == "" || newUser.LastName == "" {
+		http.Error(w, "firstName and lastName are required fields", http.StatusBadRequest)
 		return
 	}
 
