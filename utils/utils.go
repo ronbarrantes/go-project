@@ -2,7 +2,9 @@ package utils
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 )
 
@@ -24,4 +26,10 @@ func GenerateRandomId() (string, error) {
 	}
 
 	return sb.String(), nil
+}
+
+func WriteJSON(w http.ResponseWriter, status int, v any) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	return json.NewEncoder(w).Encode(v)
 }
