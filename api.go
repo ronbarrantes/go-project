@@ -50,7 +50,6 @@ func (s *APIServer) Run() {
 }
 
 // ##### USER MANAGEMENT #####
-
 func generateUser(firstName, lastName string) (User, error) {
 	randId, err := utils.GenerateRandomId()
 	if err != nil {
@@ -114,7 +113,7 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	users[createdUser.ID] = createdUser
-	WriteJSON(w, http.StatusCreated, createdUser)
+	utils.WriteJSON(w, http.StatusCreated, createdUser)
 }
 
 // READ USER
@@ -125,59 +124,84 @@ func (s *APIServer) handleGetUsers(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	WriteJSON(w, http.StatusOK, arrayUsers)
+	utils.WriteJSON(w, http.StatusOK, arrayUsers)
 }
 
 // GetUserById
 func (s *APIServer) handleGetUserById(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	// Check if the user exists
+	response := map[string]string{"message": "User not found"}
 	if _, exists := users[id]; !exists {
-		http.Error(w, "User not found", http.StatusNotFound)
+		utils.WriteJSON(w, http.StatusNotFound, response)
 		return
 	}
 
-	WriteJSON(w, http.StatusOK, users[id])
+	utils.WriteJSON(w, http.StatusOK, users[id])
 }
 
 func (s *APIServer) handleUpdateUserById(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	// Check if the user exists
-	if _, exists := users[id]; !exists {
+
+	existingUser, exists := users[id]
+	if !exists {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
-	WriteJSON(w, http.StatusOK, users[id])
+
+	// Decode the JSON body into a map
+	var updates map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Apply the updates to the existing user
+	if firstName, ok := updates["firstName"].(string); ok {
+		existingUser.FirstName = firstName
+	}
+
+	if lastName, ok := updates["lastName"].(string); ok {
+		existingUser.LastName = lastName
+	}
+
+	users[id] = existingUser
+	utils.WriteJSON(w, http.StatusOK, users[id])
 }
 
 func (s *APIServer) handleDeleteUserById(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	// Check if the user exists
+	response := map[string]string{"message": "User not found"}
 	if _, exists := users[id]; !exists {
-		http.Error(w, "User not found", http.StatusNotFound)
+		utils.WriteJSON(w, http.StatusNotFound, response)
 		return
 	}
 
 	// Delete the user
 	delete(users, id)
-
 	// Create a response message
-	response := map[string]string{"message": "Item deleted"}
-	WriteJSON(w, http.StatusNoContent, response)
+	response = map[string]string{"message": "Item deleted"}
+	utils.WriteJSON(w, http.StatusOK, response)
 }
-
-func WriteJSON(w http.ResponseWriter, status int, v any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(v); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-// UpdateUser
-// DeleteUser
 
 // STORE STUFF
+func generateStore(ownerId, storeName string) (Store, error) {
+	randId, err := utils.GenerateRandomId()
+	if err != nil {
+		return Store{}, err
+	}
+
+	store := Store{
+		ID:        randId,
+		StoreName: storeName,
+		OwnerId:   ownerId,
+	}
+
+	return store, nil
+}
+
 // CreateStores
 // GetStoreById
 // GetStores
