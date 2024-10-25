@@ -10,13 +10,12 @@ import (
 	"ronb.co/project/utils"
 )
 
-// Structs
-type APIError struct {
-	Error string
-}
-
 type APIServer struct {
 	listenAddress string
+}
+
+type APIError struct {
+	Error string
 }
 
 func Server(listerAddr string) *APIServer {
