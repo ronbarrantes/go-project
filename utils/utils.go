@@ -35,7 +35,11 @@ func GenerateRandomId() (string, error) {
 // MakeMapToArray converts a map with any key and value types to a slice of values.
 // It returns the slice of values and an error if any occurs.
 func MakeMapToArray[Key comparable, Value any](m map[Key]Value) ([]Value, error) {
-	var result []Value
+	if m == nil {
+		return []Value{}, nil
+	}
+
+	result := make([]Value, 0, len(m))
 	for _, value := range m {
 		result = append(result, value)
 	}
