@@ -97,10 +97,16 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Append the new user to the users slice
 	users = append(users, createdUser)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(createdUser); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusCreated)
+	// if err := json.NewEncoder(w).Encode(createdUser); err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// }
+
+	if err := utils.WriteJSON(w, http.StatusCreated, createdUser); err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, APIError{
+			Error: err.Error(),
+		})
 	}
 }
 
