@@ -10,6 +10,8 @@ import (
 	"ronb.co/project/utils"
 )
 
+var users = make(map[string]User)
+
 // ##### TYPES #####
 type APIServer struct {
 	listenAddress string
@@ -41,12 +43,13 @@ func Server(listerAddr string) *APIServer {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/users", s.handleAccount)
+	router.HandleFunc("/api/users/{id}", s.handleGetUser)
+
 	fmt.Printf("Listening on %s", s.listenAddress)
 	log.Fatal(http.ListenAndServe(":"+s.listenAddress, router))
 }
 
 // ##### USER MANAGEMENT #####
-var users = []User{}
 
 func generateUser(firstName, lastName string) (User, error) {
 	randId, err := utils.GenerateRandomId()
@@ -75,6 +78,7 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// CREATE USER
 func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	newUser := User{}
 
@@ -96,24 +100,40 @@ func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Append the new user to the users slice
-	users = append(users, createdUser)
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusCreated)
-	// if err := json.NewEncoder(w).Encode(createdUser); err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// }
+	// users = append(users, createdUser)
+	users[createdUser.ID] = createdUser
 
-	if err := utils.WriteJSON(w, http.StatusCreated, createdUser); err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, APIError{
-			Error: err.Error(),
-		})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(createdUser); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
+// READ USER
 func (s *APIServer) handleGetUsers(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(users); err != nil {
+
+	arrayUsers, err := utils.MakeMapToArray(users)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	if err := json.NewEncoder(w).Encode(arrayUsers); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
+
+	id := mux.Vars(r)["id"]
+	fmt.Println(id)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(users[id]); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

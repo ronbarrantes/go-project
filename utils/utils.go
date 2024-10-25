@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+// GenerateRandomId generates a random string of a fixed length.
+// The generated string consists of digits and lowercase letters.
+// It returns the generated string and an error if the random bytes
+// could not be generated.
 func GenerateRandomId() (string, error) {
 	length := 10
 	keys := "1234567890abcdefghijklmnopqrstuvwxyz"
@@ -26,6 +30,16 @@ func GenerateRandomId() (string, error) {
 	}
 
 	return sb.String(), nil
+}
+
+// MakeMapToArray converts a map with any key and value types to a slice of values.
+// It returns the slice of values and an error if any occurs.
+func MakeMapToArray[Key comparable, Value any](m map[Key]Value) ([]Value, error) {
+	var result []Value
+	for _, value := range m {
+		result = append(result, value)
+	}
+	return result, nil
 }
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
